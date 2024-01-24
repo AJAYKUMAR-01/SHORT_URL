@@ -1,13 +1,14 @@
 const express = require('express');
 const path = require('path')
+const cookieParser = require('cookie-parser');
+const { homedir } = require('os');
 
 const { connectToMongoDB } = require('./connect');
 const URL = require('./models/url');
-const { homedir } = require('os');
-
 const urlRoute = require('./routes/url');
 const staticRoute = require('./routes/staticRoute');
 const userRoute = require('./routes/user');
+const { restrictToLoggedinUserOnly } = require('./Middlewares/auth');
 
 const PORT = 8001;
 const app = express();
@@ -21,9 +22,9 @@ connectToMongoDB('mongodb://127.0.0.1:27017/short-url')
 
 // server accepts json data     
 app.use(express.json());
-
 // server accepts form data
 app.use(express.urlencoded({ extended: false }))
+app.use(cookieParser());
 
 app.use("/url", urlRoute);
 app.use("/", staticRoute);
